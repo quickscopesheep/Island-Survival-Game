@@ -9,8 +9,10 @@ import renderEngine.Entity.Camera;
 import renderEngine.Entity.Entity;
 import renderEngine.Entity.Light;
 import renderEngine.Model.Renderable;
+import renderEngine.Shader.ShaderProgram;
 import renderEngine.Util.MathUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Renderer {
@@ -32,11 +34,16 @@ public class Renderer {
 
     Vector4f clipPlane;
 
+    List<ShaderProgram> shaders;
+
     public Renderer(){
         createProjectionMatrix();
+        shaders = new ArrayList<>();
+
         loader = new Loader();
 
         clipPlane = new Vector4f(0, -1, 0, 9999);
+
         skyboxRenderer = new SkyboxRenderer(this);
     }
 
@@ -44,6 +51,30 @@ public class Renderer {
         for(Entity e : entities){
             e.render(this);
         }
+    }
+
+    public void render(Renderable renderable, Matrix4f[] transforms){
+        renderable.bind();
+
+        renderable.getShader().setUniform("lightPos", worldLight.getPos());
+        renderable.getShader().setUniform("lightColour", worldLight.getColour());
+        renderable.getShader().setUniform("ambientLight", ambientLight);
+        renderable.getShader().setUniform("skyColour", skyColour);
+        renderable.getShader().setUniform("clip_plane", clipPlane);
+        renderable.getShader().setUniform("cameraPosition", camera.getLocation());
+
+        renderable.getShader().setUniform("viewMatrix", MathUtil.createViewMatrix(camera));
+
+        for(Matrix4f transformation : transforms){
+            renderable.getShader().setUniform("transformationMatrix", transformation);
+
+            if(renderable.getModel().isShouldRenderElements())
+                GL11.glDrawElements(GL11.GL_TRIANGLES, renderable.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+            else
+                GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, renderable.getModel().getVertexCount());
+        }
+
+        renderable.unbind();
     }
 
     public void render(Renderable renderable, Matrix4f transformation){
@@ -89,6 +120,9 @@ public class Renderer {
 
     public void cleanUp(){
         loader.cleanUp();
+        for(ShaderProgram s : shaders){
+            s.cleanUp();
+        }
     }
 
     public Loader getLoader(){
@@ -142,5 +176,9 @@ public class Renderer {
 
     public SkyboxRenderer getSkyboxRenderer() {
         return skyboxRenderer;
+    }
+
+    public void addShader(ShaderProgram shader){
+        shaders.add(shader);
     }
 }

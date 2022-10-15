@@ -1,0 +1,12 @@
+{
+    "Model" : "res/models/driftwood.obj",
+    "VertexShader" : "res/shaders/baseVert.glsl",
+    "FragmentShader" : "res/shaders/baseFrag.glsl",
+    "Textures":[
+        {
+            "path" : "res/textures/driftWood.jpg",
+            "slot" : 0,
+            "hasTransparency" : false
+        }
+    ]
+}

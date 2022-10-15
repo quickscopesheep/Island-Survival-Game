@@ -2,6 +2,7 @@ package Game.Level;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 import renderEngine.Entity.Entity;
@@ -19,11 +20,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Terrain extends Entity {
     public static final float TILE_SIZE = 1f;
     public static final float TEXTURE_SCALE = .15f;
-    public static final float SEA_LEVEL = -10f;
+    public static final float SEA_LEVEL = 0;
     public static final float WATER_SCALE = 2;
 
     FrameBuffer waterRefractionBuffer;
@@ -60,9 +62,9 @@ public class Terrain extends Entity {
         Model model = generateTerrainMesh(renderer);
         System.out.println("Generated Terrain Mesh");
 
-        model.addTexture(renderer.getLoader().loadTexture("res/textures/grass.jpg"), 0, false);
-        model.addTexture(renderer.getLoader().loadTexture("res/textures/dirt.jpg"), 1, false);
-        model.addTexture(renderer.getLoader().loadTexture("res/textures/sand.jpg"), 2, false);
+        model.addTexture(renderer.getLoader().loadTexture("res/textures/terrain/grass.jpg"), 0, false);
+        model.addTexture(renderer.getLoader().loadTexture("res/textures/terrain/dirt.jpg"), 1, false);
+        model.addTexture(renderer.getLoader().loadTexture("res/textures/terrain/sand.jpg"), 2, false);
 
         terrainRenderable = new Renderable(shader, model);
         System.out.println("Generating Water Mesh");
@@ -210,8 +212,8 @@ public class Terrain extends Entity {
         Model waterModel = renderer.getLoader().loadToVAO(vertices, texCoords, indices, normals);
         waterModel.addTexture(waterRefractionBuffer.getColourTexture(), 0, false);
         waterModel.addTexture(waterRefractionBuffer.getDepthTexture(), 1, false);
-        waterModel.addTexture(renderer.getLoader().loadTexture("res/textures/water_dudv.png"), 2, false);
-        waterModel.addTexture(renderer.getLoader().loadTexture("res/textures/water_normal.png"), 3, false);
+        waterModel.addTexture(renderer.getLoader().loadTexture("res/textures/water/water_dudv.png"), 2, false);
+        waterModel.addTexture(renderer.getLoader().loadTexture("res/textures/water/water_normal.png"), 3, false);
         return new Renderable(waterShader, waterModel);
     }
 
@@ -231,7 +233,7 @@ public class Terrain extends Entity {
         float value1 = noise1.generateHeight(x, y);
         float value2 = noise2.generateHeight(x, y);
 
-        return MathUtil.lerp(value1, value2, 0.3f);
+        return MathUtil.lerp(value1, value2, 0.3f) - getFalloff(x, y)*20;
     }
 
     float getFalloff(int x, int y){

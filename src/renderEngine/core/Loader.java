@@ -20,6 +20,8 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.w3c.dom.Text;
 import renderEngine.Model.Model;
+import renderEngine.Model.Renderable;
+import renderEngine.Shader.ShaderProgram;
 import renderEngine.Texture.TextureData;
 
 public class Loader {
@@ -262,5 +264,32 @@ public class Loader {
         normalsArray[currentVertexPointer*3] = currentNormal.x;
         normalsArray[currentVertexPointer*3+1] = currentNormal.y;
         normalsArray[currentVertexPointer*3+2] = currentNormal.z;
+    }
+
+    public Renderable loadRenderableFromFile(String path, Renderer renderer){
+        JSONParser parser = new JSONParser();
+        JSONObject object;
+
+        try {
+            object = (JSONObject) parser.parse(new FileReader(path));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Model model;
+        ShaderProgram shader;
+        List<renderEngine.Texture.Texture> textures = new ArrayList<>();
+
+        model = loadOBJFile((String) object.get("Model"));
+        shader = new ShaderProgram((String)object.get("VertexShader"), (String)object.get("FragmentShader"), renderer);
+
+        JSONArray Array = (JSONArray) object.get("Textures");
+        for(Object obj : Array){
+            JSONObject json = (JSONObject) obj;
+            renderEngine.Texture.Texture texture = new renderEngine.Texture.Texture(loadTexture((String) json.get("path")), ((Long)json.get("slot")).intValue());
+            model.addTexture(texture.getId(), texture.getSlot(), (boolean)json.get("hasTransparency"));
+        }
+
+        return new Renderable(shader, model);
     }
 }

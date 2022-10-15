@@ -59,6 +59,8 @@ public class ShaderProgram {
             setUniform("projectionMatrix", renderer.getProjectionMatrix());
             unbind();
         }
+
+        renderer.addShader(this);
     }
 
     public void bind(){

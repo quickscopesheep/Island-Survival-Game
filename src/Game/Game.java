@@ -7,6 +7,9 @@ import org.lwjgl.util.vector.Vector3f;
 import renderEngine.Entity.Camera;
 import renderEngine.Entity.Entity;
 import renderEngine.Entity.Light;
+import renderEngine.Model.Model;
+import renderEngine.Model.Renderable;
+import renderEngine.Shader.ShaderProgram;
 import renderEngine.core.DisplayManager;
 import renderEngine.core.Renderer;
 
@@ -24,7 +27,7 @@ public class Game {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
 
         renderer = new Renderer();
-        camera = new Camera(new Vector3f(0, 5, 0), 0, 0, 0);
+        camera = new Camera(new Vector3f(0, 10, 0), 0, 0, 0);
 
         Light worldLight = new Light(new Vector3f(0, 25, 20), new Vector3f(1, 1, .95f));
 
@@ -35,8 +38,13 @@ public class Game {
         renderer.setAmbientLight(new Vector3f(.2f, .2f, .2f));
         renderer.setSkyColour(new Vector3f(0.7f, 0.9f, 1f));
 
-        level = new Terrain(256, 256, 1, renderer);
+        level = new Terrain(300, 300, 1, renderer);
         entities.add(level);
+
+        Renderable driftWoodRenderable = renderer.getLoader().loadRenderableFromFile("res/renderables/driftwood.renderable", renderer);
+        Entity entity = new Entity(new Vector3f(0, 10, 0), driftWoodRenderable);
+        entities.add(entity);
+
         gameLoop();
     }
 
