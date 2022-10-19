@@ -11,6 +11,7 @@ import renderEngine.Entity.Light;
 import renderEngine.Model.Renderable;
 import renderEngine.Shader.ShaderProgram;
 import renderEngine.Util.MathUtil;
+import renderEngine.gui.GuiRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class Renderer {
     Loader loader;
 
     SkyboxRenderer skyboxRenderer;
+    GuiRenderer guiRenderer;
 
     Light worldLight;
     Camera camera;
@@ -45,6 +47,7 @@ public class Renderer {
         clipPlane = new Vector4f(0, -1, 0, 9999);
 
         skyboxRenderer = new SkyboxRenderer(this);
+        guiRenderer = new GuiRenderer(this);
     }
 
     public void renderScene(List<Entity> entities){
@@ -176,6 +179,10 @@ public class Renderer {
 
     public SkyboxRenderer getSkyboxRenderer() {
         return skyboxRenderer;
+    }
+
+    public GuiRenderer getGuiRenderer() {
+        return guiRenderer;
     }
 
     public void addShader(ShaderProgram shader){

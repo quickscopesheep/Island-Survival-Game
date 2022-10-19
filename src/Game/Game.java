@@ -3,6 +3,7 @@ package Game;
 import Game.Level.Terrain;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import renderEngine.Entity.Camera;
 import renderEngine.Entity.Entity;
@@ -12,6 +13,8 @@ import renderEngine.Model.Renderable;
 import renderEngine.Shader.ShaderProgram;
 import renderEngine.core.DisplayManager;
 import renderEngine.core.Renderer;
+import renderEngine.gui.GuiElement;
+import renderEngine.gui.GuiRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,8 @@ public class Game {
     public static Camera camera;
     public static Terrain level;
     public static List<Entity> entities;
+
+    GuiElement crossHair;
 
     public Game(){
         DisplayManager.CreateDisplay(1280, 720, 120);
@@ -41,9 +46,7 @@ public class Game {
         level = new Terrain(300, 300, 1, renderer);
         entities.add(level);
 
-        Renderable driftWoodRenderable = renderer.getLoader().loadRenderableFromFile("res/renderables/driftwood.renderable", renderer);
-        Entity entity = new Entity(new Vector3f(0, 10, 0), driftWoodRenderable);
-        entities.add(entity);
+        crossHair = new GuiElement(renderer.getLoader().loadTexture("res/textures/gui/crossHair.png"), new Vector2f(0, 0), new Vector2f(.01f, .01f));
 
         gameLoop();
     }
@@ -64,6 +67,8 @@ public class Game {
 
             renderer.getSkyboxRenderer().render(camera);
             renderer.renderScene(entities);
+
+            renderer.getGuiRenderer().renderGui(crossHair);
 
             camera.move();
 

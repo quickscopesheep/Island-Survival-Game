@@ -29,6 +29,7 @@ public class Terrain extends Entity {
     public static final float WATER_SCALE = 2;
 
     FrameBuffer waterRefractionBuffer;
+    FrameBuffer waterFoamBuffer;
 
     Renderable terrainRenderable;
     Renderable waterRenderable;
@@ -49,6 +50,7 @@ public class Terrain extends Entity {
         this.seed = seed;
 
         waterRefractionBuffer = new FrameBuffer(Display.getWidth(), Display.getHeight(), FrameBuffer.DEPTH_TEXTURE);
+        waterFoamBuffer = new FrameBuffer(Display.getWidth(), Display.getHeight(), FrameBuffer.DEPTH_TEXTURE);
 
         ShaderProgram shader = new ShaderProgram("res/shaders/terrainVert.glsl", "res/shaders/terrainFrag.glsl", renderer);
         shader.bind();
@@ -207,13 +209,12 @@ public class Terrain extends Entity {
         waterShader.setUniform("colourTexture", 0);
         waterShader.setUniform("depthTexture", 1);
         waterShader.setUniform("dudvtexture", 2);
-        waterShader.setUniform("normalMap", 3);
 
         Model waterModel = renderer.getLoader().loadToVAO(vertices, texCoords, indices, normals);
         waterModel.addTexture(waterRefractionBuffer.getColourTexture(), 0, false);
         waterModel.addTexture(waterRefractionBuffer.getDepthTexture(), 1, false);
         waterModel.addTexture(renderer.getLoader().loadTexture("res/textures/water/water_dudv.png"), 2, false);
-        waterModel.addTexture(renderer.getLoader().loadTexture("res/textures/water/water_normal.png"), 3, false);
+
         return new Renderable(waterShader, waterModel);
     }
 
